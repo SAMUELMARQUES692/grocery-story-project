@@ -6,12 +6,10 @@ import dev.samuel.projectgrocery.service.CategoriaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -26,4 +24,21 @@ public class CategoriaController {
         URI location = URI.create("/api/categorias/" + response.id());
         return ResponseEntity.created(location).body(response);
     }
+
+    @GetMapping
+    public ResponseEntity<List<CategoriaResponse>> listarTodas() {
+        return ResponseEntity.ok(categoriaService.listarTodas());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoriaResponse> atualizarCategoria(@PathVariable Long id,@RequestBody @Valid CategoriaRequest request) {
+        return ResponseEntity.ok(categoriaService.atualizarCategoria(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarCategoria(@PathVariable Long id) {
+        categoriaService.deletarCategoria(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
