@@ -6,12 +6,10 @@ import dev.samuel.projectgrocery.service.FornecedorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -25,6 +23,22 @@ public class FornecedorController {
         FornecedorResponse response = fornecedorService.criarFornecedor(request);
         URI location = URI.create("/api/fornecedores/" + response.id());
         return ResponseEntity.created(location).body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<FornecedorResponse>> listarFornecedor() {
+        return ResponseEntity.ok(fornecedorService.listarFornecedores());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<FornecedorResponse> atualizarForncedor(@PathVariable Long id,@RequestBody @Valid FornecedorRequest request) {
+        return ResponseEntity.ok(fornecedorService.atualizarFornecedor(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarFornecedor(@PathVariable Long id) {
+        fornecedorService.deletarFornecedor(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
