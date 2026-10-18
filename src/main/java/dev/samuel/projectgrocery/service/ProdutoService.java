@@ -3,10 +3,7 @@ package dev.samuel.projectgrocery.service;
 import dev.samuel.projectgrocery.entity.Categoria;
 import dev.samuel.projectgrocery.entity.Fornecedor;
 import dev.samuel.projectgrocery.entity.Produto;
-import dev.samuel.projectgrocery.exception.CategoriaNotFoundException;
-import dev.samuel.projectgrocery.exception.CodigoBarrasDuplicadoException;
-import dev.samuel.projectgrocery.exception.FornecedorNotFoundException;
-import dev.samuel.projectgrocery.exception.ProdutoNotFoundException;
+import dev.samuel.projectgrocery.exception.*;
 import dev.samuel.projectgrocery.mapper.ProdutoMapper;
 import dev.samuel.projectgrocery.repository.CategoriaRepository;
 import dev.samuel.projectgrocery.repository.FornecedorRepository;
@@ -14,9 +11,11 @@ import dev.samuel.projectgrocery.repository.ProdutoRepository;
 import dev.samuel.projectgrocery.request.ProdutoRequest;
 import dev.samuel.projectgrocery.response.ProdutoResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -30,6 +29,8 @@ public class ProdutoService {
 
    @Transactional
     public ProdutoResponse criarProduto(ProdutoRequest request) {
+       String codigoProduto = gerarCodigoProduto();
+
         if (produtoRepository.existsByCodigoBarras(request.codigoBarras())) {
             throw new CodigoBarrasDuplicadoException(request.codigoBarras());
         }
@@ -43,6 +44,7 @@ public class ProdutoService {
        Produto produto = produtoMapper.toProduto(request);
        produto.setCategoria(categoria);
        produto.setFornecedor(fornecedor);
+       produto.setCodigoProduto(codigoProduto);
        Produto salvar = produtoRepository.save(produto);
        return produtoMapper.toProdutoResponse(salvar);
     }
@@ -69,4 +71,13 @@ public class ProdutoService {
         produtoRepository.delete(produto);
     }
 
+    public String gerarCodigoProduto() {
+        Long codigo;
+        try {
+            codigo = produtoRepository.proximoCodigo();
+        } catch (DataAccessException e) {
+            throw new LimiteSequencialException();
+        }
+        return String.format("%04d", codigo);
+    }
 }

@@ -30,6 +30,9 @@ public class Produto {
     @Column(length = 100, nullable = false)
     private String nome;
 
+    @Column(name = "codigo_do_produto", length = 4, nullable = false, unique = true)
+    private String codigoProduto;
+
     @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal precoCusto;
 

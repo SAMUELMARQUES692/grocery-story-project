@@ -1,0 +1,2 @@
+ALTER TABLE produtos
+ADD COLUMN codigo_do_produto VARCHAR(4) NOT NULL UNIQUE

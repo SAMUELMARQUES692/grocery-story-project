@@ -1,0 +1,5 @@
+CREATE SEQUENCE codigo_produto_seq
+    START WITH 1
+    INCREMENT BY 1
+    MAXVALUE 9999
+    NO CYCLE;

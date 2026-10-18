@@ -10,6 +10,7 @@ public record ProdutoResponse(
     Long id,
     String codigoBarras,
     String nome,
+    String codigoProduto,
     BigDecimal precoCusto,
     BigDecimal precoVenda,
     UnidadeMedida unidadeMedida,
