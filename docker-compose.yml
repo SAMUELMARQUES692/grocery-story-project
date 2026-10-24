@@ -1,0 +1,15 @@
+services:
+  rabbitmq:
+    image: rabbitmq:4.1-management
+    container_name: grocery-rabbitmq
+    ports:
+      - "5672:5672"     # porta que a aplicação usa
+      - "15672:15672"   # painel web
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBIT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBIT_PASSWORD}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  rabbitmq_data:

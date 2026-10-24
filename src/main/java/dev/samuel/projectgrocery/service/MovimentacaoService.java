@@ -29,6 +29,7 @@ public class MovimentacaoService {
     private final EstoqueDepositoRepository estoqueDepositoRepository;
     private final ItemGondolaRepository itemGondolaRepository;
     private final MovimentacaoMapper movimentacaoMapper;
+    private final AlertaEstoqueService alertaEstoqueService;
 
     @Transactional
     public MovimentacaoResponse entradaEstoque(MovimentacaoRequest request) {
@@ -64,6 +65,7 @@ public class MovimentacaoService {
                     .orElseThrow(() -> new ProdutoItemGondolaNotFoundException(produto.getId()));
 
             Integer subtrairPosicaoEstoque = estoqueDeposito.getQuantidade() - request.quantidade();
+            alertaEstoqueService.verificarDeposito(estoqueDeposito);
             Integer somarItemGondola = itemGondola.getQuantidadeAtual() + request.quantidade();
 
             estoqueDeposito.setQuantidade(subtrairPosicaoEstoque);
