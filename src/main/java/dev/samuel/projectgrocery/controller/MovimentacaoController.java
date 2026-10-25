@@ -1,11 +1,13 @@
 package dev.samuel.projectgrocery.controller;
 
+import dev.samuel.projectgrocery.request.EntradaEstoqueRequest;
 import dev.samuel.projectgrocery.request.MovimentacaoRequest;
 import dev.samuel.projectgrocery.request.ReposicaoRequest;
 import dev.samuel.projectgrocery.response.MovimentacaoResponse;
 import dev.samuel.projectgrocery.service.MovimentacaoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,10 +22,10 @@ import java.util.List;
 @RequestMapping("/api/movimentacoes")
 public class MovimentacaoController {
 
-    public final MovimentacaoService movimentacaoService;
+    private final MovimentacaoService movimentacaoService;
 
     @PostMapping("/entrada")
-    public ResponseEntity<MovimentacaoResponse> entradaEstoque(@RequestBody @Valid MovimentacaoRequest request) {
+    public ResponseEntity<MovimentacaoResponse> entradaEstoque(@RequestBody @Valid EntradaEstoqueRequest request) {
         MovimentacaoResponse response = movimentacaoService.entradaEstoque(request);
         URI location = URI.create("/api/movimentacoes/" + response.id());
         return ResponseEntity.created(location).body(response);
@@ -32,8 +34,7 @@ public class MovimentacaoController {
     @PostMapping("/reposicao")
     public ResponseEntity<List<MovimentacaoResponse>> reposicaoGondola(@RequestBody @Valid ReposicaoRequest request) {
         List<MovimentacaoResponse> response = movimentacaoService.reposicaoGondola(request);
-        URI location = URI.create("/api/movimentacoes/" + response);
-        return ResponseEntity.created(location).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/venda")

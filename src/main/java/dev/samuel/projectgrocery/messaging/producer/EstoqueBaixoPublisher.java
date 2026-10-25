@@ -30,7 +30,7 @@ public class EstoqueBaixoPublisher {
         }catch (AmqpException e) {
             // A movimentacao ja foi gravada; nao deixa a falha do RabbitMQ virar erro 500.
             // O alerta fica com emailEnviado = false e pode ser reenviado depois.
-            log.info("Falha ao publicar o evento do alerta {}: {}", event.alertaId(), e.getMessage());
+            log.error("Falha ao publicar o evento do alerta {}: {}", event.alertaId(), e.getMessage());
         }
     }
 

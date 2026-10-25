@@ -9,6 +9,7 @@ import dev.samuel.projectgrocery.repository.EstoqueDepositoRepository;
 import dev.samuel.projectgrocery.repository.ItemGondolaRepository;
 import dev.samuel.projectgrocery.repository.MovimentacaoRepository;
 import dev.samuel.projectgrocery.repository.ProdutoRepository;
+import dev.samuel.projectgrocery.request.EntradaEstoqueRequest;
 import dev.samuel.projectgrocery.request.MovimentacaoRequest;
 import dev.samuel.projectgrocery.request.ReposicaoRequest;
 import dev.samuel.projectgrocery.response.MovimentacaoResponse;
@@ -30,24 +31,30 @@ public class MovimentacaoService {
     private final AlertaEstoqueService alertaEstoqueService;
 
     @Transactional
-    public MovimentacaoResponse entradaEstoque(MovimentacaoRequest request) {
+    public MovimentacaoResponse entradaEstoque(EntradaEstoqueRequest request) {
         Produto produto = produtoRepository.findById(request.produtoId())
                 .orElseThrow(() -> new ProdutoNotFoundException(request.produtoId()));
 
-        if (request.local().equals(LocalProduto.DEPOSITO) && request.tipo().equals(TipoMovimentacao.ENTRADA)) {
-            EstoqueDeposito estoqueDeposito = estoqueDepositoRepository.findByProdutoId(produto.getId())
-                    .orElseThrow(() -> new ProdutoEstoqueDepositoNotFoundException(produto.getId()));
-
-            Integer somaEstoque = estoqueDeposito.getQuantidade() + request.quantidade();
-
-            estoqueDeposito.setQuantidade(somaEstoque);
-            estoqueDepositoRepository.save(estoqueDeposito);
+        // 1. Verifica se o produto esta ativo
+        if (!produto.isAtivo()) {
+            throw new ProdutoInativoException(produto.getId());
         }
 
-        Movimentacao movimentacao = movimentacaoMapper.toMovimentacao(request);
-        movimentacao.setProduto(produto);
-        Movimentacao salvar = movimentacaoRepository.save(movimentacao);
-        return movimentacaoMapper.toMovimentacaoResponse(salvar);
+        // 2. busca a posicão no estoque que tem relacionamento com o produto
+        EstoqueDeposito estoqueDeposito = estoqueDepositoRepository.findByProdutoId(request.produtoId())
+                .orElseThrow(() -> new ProdutoEstoqueDepositoNotFoundException(request.produtoId()));
+
+        // 3. Coloca a quantidade em uma variavel e seta a quantidade da soma do estoque e a quantidade da request.
+        int quantidade = request.quantidade();
+        estoqueDeposito.setQuantidade(estoqueDeposito.getQuantidade() + quantidade);
+
+        // 4. Registra as a movimentação da entidade
+        Movimentacao entrada = registrar(produto, TipoMovimentacao.ENTRADA, LocalProduto.DEPOSITO, null, quantidade, request.observacao());
+
+        // 5. Atualiza o alerta do depósito (resolve se o saldo voltou acima do mínimo)
+        alertaEstoqueService.verificarDeposito(estoqueDeposito);
+
+        return movimentacaoMapper.toMovimentacaoResponse(entrada);
     }
 
     @Transactional
@@ -78,8 +85,8 @@ public class MovimentacaoService {
         itemGondola.setQuantidadeAtual(itemGondola.getQuantidadeAtual() + quantidade);
 
         // 2. registra as duas pontas da reposicao no historico
-        Movimentacao saida = registrar(produto, LocalProduto.DEPOSITO, null, quantidade, request.observacao());
-        Movimentacao entrada = registrar(produto, LocalProduto.GONDOLA, itemGondola.getGondola(), quantidade, request.observacao());
+        Movimentacao saida = registrar(produto, TipoMovimentacao.REPOSICAO, LocalProduto.DEPOSITO, null, quantidade, request.observacao());
+        Movimentacao entrada = registrar(produto, TipoMovimentacao.REPOSICAO, LocalProduto.GONDOLA, itemGondola.getGondola(), quantidade, request.observacao());
 
         // 3. so agora verifica os alertas, com os saldos ja atualizados
         alertaEstoqueService.verificarDeposito(estoqueDeposito);
@@ -159,10 +166,10 @@ public class MovimentacaoService {
         return movimentacaoMapper.toMovimentacaoResponse(salvar);
     }
 
-    private Movimentacao registrar(Produto produto, LocalProduto local, Gondola gondola, int quantidade, String observacao) {
+    private Movimentacao registrar(Produto produto, TipoMovimentacao tipo, LocalProduto local, Gondola gondola, int quantidade, String observacao) {
         return movimentacaoRepository.save(Movimentacao.builder()
                 .produto(produto)
-                .tipo(TipoMovimentacao.REPOSICAO)
+                .tipo(tipo)
                 .local(local)
                 .gondola(gondola)
                 .quantidade(quantidade)

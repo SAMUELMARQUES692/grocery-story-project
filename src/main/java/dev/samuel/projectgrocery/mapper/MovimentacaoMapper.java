@@ -12,6 +12,7 @@ public interface MovimentacaoMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "produto", ignore = true)
+    @Mapping(target = "gondola", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     Movimentacao toMovimentacao(MovimentacaoRequest request);
 
@@ -21,6 +22,7 @@ public interface MovimentacaoMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "produto", ignore = true)
+    @Mapping(target = "gondola", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     void atualizarMovimentacao(MovimentacaoRequest request, @MappingTarget Movimentacao movimentacao);
 
