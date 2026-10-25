@@ -7,7 +7,5 @@ import java.util.Optional;
 
 public interface ItemGondolaRepository extends JpaRepository<ItemGondola, Long> {
 
-    Optional<ItemGondola> findByProdutoId(Long produtoId);
-
     Optional<ItemGondola> findByGondolaIdAndProdutoId(Long gondolaId, Long produtoId);
 }

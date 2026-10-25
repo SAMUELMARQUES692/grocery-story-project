@@ -5,13 +5,11 @@ import dev.samuel.projectgrocery.enums.LocalProduto;
 import dev.samuel.projectgrocery.enums.TipoMovimentacao;
 import dev.samuel.projectgrocery.exception.*;
 import dev.samuel.projectgrocery.mapper.MovimentacaoMapper;
-import dev.samuel.projectgrocery.repository.EstoqueDepositoRepository;
-import dev.samuel.projectgrocery.repository.ItemGondolaRepository;
-import dev.samuel.projectgrocery.repository.MovimentacaoRepository;
-import dev.samuel.projectgrocery.repository.ProdutoRepository;
+import dev.samuel.projectgrocery.repository.*;
 import dev.samuel.projectgrocery.request.EntradaEstoqueRequest;
 import dev.samuel.projectgrocery.request.MovimentacaoRequest;
 import dev.samuel.projectgrocery.request.ReposicaoRequest;
+import dev.samuel.projectgrocery.request.VendaRequest;
 import dev.samuel.projectgrocery.response.MovimentacaoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -98,23 +96,36 @@ public class MovimentacaoService {
     }
 
     @Transactional
-    public MovimentacaoResponse venda(MovimentacaoRequest request) {
+    public MovimentacaoResponse venda(VendaRequest request) {
         Produto produto = produtoRepository.findById(request.produtoId())
                 .orElseThrow(() -> new ProdutoNotFoundException(request.produtoId()));
 
-        if (request.local().equals(LocalProduto.GONDOLA) && request.tipo().equals(TipoMovimentacao.VENDA)) {
-            ItemGondola itemGondola = itemGondolaRepository.findByProdutoId(produto.getId())
-                    .orElseThrow(() -> new ProdutoItemGondolaNotFoundException(produto.getId()));
-
-            Integer subtrairGondola = itemGondola.getQuantidadeAtual() - request.quantidade();
-            itemGondola.setQuantidadeAtual(subtrairGondola);
-            itemGondolaRepository.save(itemGondola);
+        // 1. Verifica se o produto esta ativo
+        if (!produto.isAtivo()) {
+            throw new ProdutoInativoException(produto.getId());
         }
 
-        Movimentacao movimentacao = movimentacaoMapper.toMovimentacao(request);
-        movimentacao.setProduto(produto);
-        Movimentacao salvar = movimentacaoRepository.save(movimentacao);
-        return movimentacaoMapper.toMovimentacaoResponse(salvar);
+        // 2. Verifica se o produto esta na gondola certa
+        ItemGondola itemGondola = itemGondolaRepository.findByGondolaIdAndProdutoId(request.gondolaId(), produto.getId())
+                .orElseThrow(() -> new ProdutoGondolaErradaException(produto.getId(), request.gondolaId()));
+
+        int quantidade = request.quantidade();
+
+        // 3. Verifica se o item na gondola tem saldo suficiente para fazer a venda
+        if (itemGondola.getQuantidadeAtual() < quantidade) {
+            throw new EstoqueInsuficienteException(produto.getId(), itemGondola.getQuantidadeAtual(), quantidade);
+        }
+
+        // 4. atualiza os saldos (entidades gerenciadas: o Hibernate grava no commit, sem save)
+        itemGondola.setQuantidadeAtual(itemGondola.getQuantidadeAtual() - quantidade);
+
+        // 5. Registra as a movimentação da entidade
+        Movimentacao saida = registrar(produto, TipoMovimentacao.VENDA, LocalProduto.GONDOLA, itemGondola.getGondola(), quantidade, request.observacao());
+
+        // 6. Atualiza o alerta da gondola (verifica se possição está com quantidade minima)
+        alertaEstoqueService.verificarGondola(itemGondola);
+
+        return movimentacaoMapper.toMovimentacaoResponse(saida);
     }
 
     @Transactional

@@ -3,6 +3,7 @@ package dev.samuel.projectgrocery.controller;
 import dev.samuel.projectgrocery.request.EntradaEstoqueRequest;
 import dev.samuel.projectgrocery.request.MovimentacaoRequest;
 import dev.samuel.projectgrocery.request.ReposicaoRequest;
+import dev.samuel.projectgrocery.request.VendaRequest;
 import dev.samuel.projectgrocery.response.MovimentacaoResponse;
 import dev.samuel.projectgrocery.service.MovimentacaoService;
 import jakarta.validation.Valid;
@@ -38,7 +39,7 @@ public class MovimentacaoController {
     }
 
     @PostMapping("/venda")
-    public ResponseEntity<MovimentacaoResponse> venda(@RequestBody @Valid MovimentacaoRequest request) {
+    public ResponseEntity<MovimentacaoResponse> venda(@RequestBody @Valid VendaRequest request) {
         MovimentacaoResponse response = movimentacaoService.venda(request);
         URI location = URI.create("/api/movimentacoes/" + response.id());
         return ResponseEntity.created(location).body(response);
