@@ -5,14 +5,16 @@ import dev.samuel.projectgrocery.enums.LocalProduto;
 import dev.samuel.projectgrocery.enums.TipoMovimentacao;
 import dev.samuel.projectgrocery.exception.*;
 import dev.samuel.projectgrocery.mapper.MovimentacaoMapper;
-import dev.samuel.projectgrocery.repository.*;
+import dev.samuel.projectgrocery.repository.EstoqueDepositoRepository;
+import dev.samuel.projectgrocery.repository.ItemGondolaRepository;
+import dev.samuel.projectgrocery.repository.MovimentacaoRepository;
+import dev.samuel.projectgrocery.repository.ProdutoRepository;
 import dev.samuel.projectgrocery.request.*;
 import dev.samuel.projectgrocery.response.MovimentacaoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.IllegalFormatCodePointException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -25,7 +27,6 @@ public class MovimentacaoService {
     private final ItemGondolaRepository itemGondolaRepository;
     private final MovimentacaoMapper movimentacaoMapper;
     private final AlertaEstoqueService alertaEstoqueService;
-    private final TipoMovimentacao tipo;
 
     @Transactional
     public MovimentacaoResponse entradaEstoque(EntradaEstoqueRequest request) {
