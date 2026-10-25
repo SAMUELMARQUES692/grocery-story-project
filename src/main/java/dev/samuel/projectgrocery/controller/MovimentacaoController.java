@@ -1,9 +1,6 @@
 package dev.samuel.projectgrocery.controller;
 
-import dev.samuel.projectgrocery.request.EntradaEstoqueRequest;
-import dev.samuel.projectgrocery.request.MovimentacaoRequest;
-import dev.samuel.projectgrocery.request.ReposicaoRequest;
-import dev.samuel.projectgrocery.request.VendaRequest;
+import dev.samuel.projectgrocery.request.*;
 import dev.samuel.projectgrocery.response.MovimentacaoResponse;
 import dev.samuel.projectgrocery.service.MovimentacaoService;
 import jakarta.validation.Valid;
@@ -46,14 +43,14 @@ public class MovimentacaoController {
     }
 
     @PostMapping("/ajuste")
-    public ResponseEntity<MovimentacaoResponse> ajusteEstoque(@RequestBody @Valid MovimentacaoRequest request) {
+    public ResponseEntity<MovimentacaoResponse> ajusteEstoque(@RequestBody @Valid AjusteRequest request) {
         MovimentacaoResponse response = movimentacaoService.ajusteEstoque(request);
         URI location = URI.create("/api/movimentacoes/" + response.id());
         return ResponseEntity.created(location).body(response);
     }
 
     @PostMapping("/perda")
-    public ResponseEntity<MovimentacaoResponse> perdaEstoque(@RequestBody @Valid MovimentacaoRequest request) {
+    public ResponseEntity<MovimentacaoResponse> perdaEstoque(@RequestBody @Valid PerdaRequest request) {
         MovimentacaoResponse response = movimentacaoService.perdaEstoque(request);
         URI location = URI.create("/api/movimentacoes/" + response.id());
         return ResponseEntity.created(location).body(response);
