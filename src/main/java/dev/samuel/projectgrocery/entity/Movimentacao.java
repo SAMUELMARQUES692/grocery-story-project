@@ -29,6 +29,10 @@ public class Movimentacao {
     @JoinColumn(name = "produto_id", nullable = false)
     private Produto produto;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "gondola_id")
+    private Gondola gondola;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_movimentacao", nullable = false, length = 20)
     private TipoMovimentacao tipo;

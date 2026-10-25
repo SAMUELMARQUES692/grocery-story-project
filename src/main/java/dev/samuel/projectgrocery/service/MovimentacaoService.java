@@ -1,24 +1,22 @@
 package dev.samuel.projectgrocery.service;
 
-import dev.samuel.projectgrocery.entity.EstoqueDeposito;
-import dev.samuel.projectgrocery.entity.ItemGondola;
-import dev.samuel.projectgrocery.entity.Movimentacao;
-import dev.samuel.projectgrocery.entity.Produto;
+import dev.samuel.projectgrocery.entity.*;
 import dev.samuel.projectgrocery.enums.LocalProduto;
 import dev.samuel.projectgrocery.enums.TipoMovimentacao;
-import dev.samuel.projectgrocery.exception.ProdutoEstoqueDepositoNotFoundException;
-import dev.samuel.projectgrocery.exception.ProdutoItemGondolaNotFoundException;
-import dev.samuel.projectgrocery.exception.ProdutoNotFoundException;
+import dev.samuel.projectgrocery.exception.*;
 import dev.samuel.projectgrocery.mapper.MovimentacaoMapper;
 import dev.samuel.projectgrocery.repository.EstoqueDepositoRepository;
 import dev.samuel.projectgrocery.repository.ItemGondolaRepository;
 import dev.samuel.projectgrocery.repository.MovimentacaoRepository;
 import dev.samuel.projectgrocery.repository.ProdutoRepository;
 import dev.samuel.projectgrocery.request.MovimentacaoRequest;
+import dev.samuel.projectgrocery.request.ReposicaoRequest;
 import dev.samuel.projectgrocery.response.MovimentacaoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -53,32 +51,43 @@ public class MovimentacaoService {
     }
 
     @Transactional
-    public MovimentacaoResponse reposicaoGondola(MovimentacaoRequest request) {
+    public List<MovimentacaoResponse> reposicaoGondola(ReposicaoRequest request) {
         Produto produto = produtoRepository.findById(request.produtoId())
                 .orElseThrow(() -> new ProdutoNotFoundException(request.produtoId()));
 
-        if (request.local().equals(LocalProduto.GONDOLA) && request.tipo().equals(TipoMovimentacao.REPOSICAO)) {
-            EstoqueDeposito estoqueDeposito = estoqueDepositoRepository.findByProdutoId(produto.getId())
-                    .orElseThrow(() -> new ProdutoEstoqueDepositoNotFoundException(produto.getId()));
+        EstoqueDeposito estoqueDeposito = estoqueDepositoRepository.findByProdutoId(request.produtoId())
+                .orElseThrow(() -> new ProdutoEstoqueDepositoNotFoundException(request.produtoId()));
 
-            ItemGondola itemGondola = itemGondolaRepository.findByProdutoId(produto.getId())
-                    .orElseThrow(() -> new ProdutoItemGondolaNotFoundException(produto.getId()));
+        ItemGondola itemGondola =
+                itemGondolaRepository.findByGondolaIdAndProdutoId(request.gondolaId(), produto.getId())
+                        .orElseThrow(() -> new ProdutoGondolaErradaException(produto.getId(), request.gondolaId()));
 
-            Integer subtrairPosicaoEstoque = estoqueDeposito.getQuantidade() - request.quantidade();
-            alertaEstoqueService.verificarDeposito(estoqueDeposito);
-            Integer somarItemGondola = itemGondola.getQuantidadeAtual() + request.quantidade();
+        int quantidade = request.quantidade();
 
-            estoqueDeposito.setQuantidade(subtrairPosicaoEstoque);
-            itemGondola.setQuantidadeAtual(somarItemGondola);
-
-            estoqueDepositoRepository.save(estoqueDeposito);
-            itemGondolaRepository.save(itemGondola);
+        if (estoqueDeposito.getQuantidade() < quantidade) {
+            throw new EstoqueInsuficienteException(produto.getId(), estoqueDeposito.getQuantidade(), quantidade);
         }
 
-        Movimentacao movimentacao = movimentacaoMapper.toMovimentacao(request);
-        movimentacao.setProduto(produto);
-        Movimentacao salvar = movimentacaoRepository.save(movimentacao);
-        return movimentacaoMapper.toMovimentacaoResponse(salvar);
+        int espacoLivre = itemGondola.getCapacidadeMaxima() - itemGondola.getQuantidadeAtual();
+        if (quantidade > espacoLivre) {
+            throw new CapacidadeGondolaExcedidaException(itemGondola.getId(), espacoLivre, quantidade);
+        }
+
+        // 1. atualiza os saldos (entidades gerenciadas: o Hibernate grava no commit, sem save)
+        estoqueDeposito.setQuantidade(estoqueDeposito.getQuantidade() - quantidade);
+        itemGondola.setQuantidadeAtual(itemGondola.getQuantidadeAtual() + quantidade);
+
+        // 2. registra as duas pontas da reposicao no historico
+        Movimentacao saida = registrar(produto, LocalProduto.DEPOSITO, null, quantidade, request.observacao());
+        Movimentacao entrada = registrar(produto, LocalProduto.GONDOLA, itemGondola.getGondola(), quantidade, request.observacao());
+
+        // 3. so agora verifica os alertas, com os saldos ja atualizados
+        alertaEstoqueService.verificarDeposito(estoqueDeposito);
+        alertaEstoqueService.verificarGondola(itemGondola);
+
+        return List.of(
+                movimentacaoMapper.toMovimentacaoResponse(saida),
+                movimentacaoMapper.toMovimentacaoResponse(entrada));
     }
 
     @Transactional
@@ -148,5 +157,16 @@ public class MovimentacaoService {
         movimentacao.setProduto(produto);
         Movimentacao salvar = movimentacaoRepository.save(movimentacao);
         return movimentacaoMapper.toMovimentacaoResponse(salvar);
+    }
+
+    private Movimentacao registrar(Produto produto, LocalProduto local, Gondola gondola, int quantidade, String observacao) {
+        return movimentacaoRepository.save(Movimentacao.builder()
+                .produto(produto)
+                .tipo(TipoMovimentacao.REPOSICAO)
+                .local(local)
+                .gondola(gondola)
+                .quantidade(quantidade)
+                .observacao(observacao)
+                .build());
     }
 }

@@ -16,6 +16,7 @@ public interface MovimentacaoMapper {
     Movimentacao toMovimentacao(MovimentacaoRequest request);
 
     @Mapping(target = "produtoId", source = "produto.id")
+    @Mapping(target = "gondolaId", source = "gondola.id")
     MovimentacaoResponse toMovimentacaoResponse(Movimentacao movimentacao);
 
     @Mapping(target = "id", ignore = true)

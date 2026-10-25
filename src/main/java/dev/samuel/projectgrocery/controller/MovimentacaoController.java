@@ -1,6 +1,7 @@
 package dev.samuel.projectgrocery.controller;
 
 import dev.samuel.projectgrocery.request.MovimentacaoRequest;
+import dev.samuel.projectgrocery.request.ReposicaoRequest;
 import dev.samuel.projectgrocery.response.MovimentacaoResponse;
 import dev.samuel.projectgrocery.service.MovimentacaoService;
 import jakarta.validation.Valid;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -28,9 +30,9 @@ public class MovimentacaoController {
     }
 
     @PostMapping("/reposicao")
-    public ResponseEntity<MovimentacaoResponse> reposicaoGondola(@RequestBody @Valid MovimentacaoRequest request) {
-        MovimentacaoResponse response = movimentacaoService.reposicaoGondola(request);
-        URI location = URI.create("/api/movimentacoes/" + response.id());
+    public ResponseEntity<List<MovimentacaoResponse>> reposicaoGondola(@RequestBody @Valid ReposicaoRequest request) {
+        List<MovimentacaoResponse> response = movimentacaoService.reposicaoGondola(request);
+        URI location = URI.create("/api/movimentacoes/" + response);
         return ResponseEntity.created(location).body(response);
     }
 
