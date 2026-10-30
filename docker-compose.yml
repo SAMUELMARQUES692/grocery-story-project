@@ -11,5 +11,13 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
 
+  mailpit:
+    image: axllent/mailpit:v1.21
+    container_name: grocery-mailpit
+    ports:
+        - "1025:1025"   # SMTP: a aplicação envia por aqui
+        - "8025:8025"   # caixa de entrada no navegador
+
 volumes:
   rabbitmq_data:
+
