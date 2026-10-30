@@ -87,9 +87,10 @@ public class AlertaEstoqueService {
 
     @Transactional
     public void marcarEmailEnviado(Long alertaId) {
-        AlertaEstoque alerta = alertaEstoqueRepository.findById(alertaId)
-                .orElseThrow(() -> new AlertaEstoqueNotFoundException(alertaId));
-        alerta.setEmailEnviado(true);
+        alertaEstoqueRepository.findById(alertaId)
+                .ifPresentOrElse(
+                        alerta -> alerta.setEmailEnviado(true),
+                        () -> log.warn("Alerta {} não encontrado ao marcar e-mail como enviado", alertaId));
     }
 
     @Transactional(readOnly = true)
