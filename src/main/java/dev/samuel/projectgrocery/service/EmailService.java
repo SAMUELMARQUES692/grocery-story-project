@@ -3,7 +3,7 @@ package dev.samuel.projectgrocery.service;
 import dev.samuel.projectgrocery.entity.Email;
 import dev.samuel.projectgrocery.enums.EmailStatus;
 import dev.samuel.projectgrocery.repository.EmailRepository;
-import dev.samuel.projectgrocery.request.EstoqueBaixoEvent;
+import dev.samuel.projectgrocery.messaging.events.EstoqueBaixoEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

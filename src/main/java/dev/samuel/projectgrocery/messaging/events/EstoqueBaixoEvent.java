@@ -1,4 +1,4 @@
-package dev.samuel.projectgrocery.request;
+package dev.samuel.projectgrocery.messaging.events;
 
 import dev.samuel.projectgrocery.enums.LocalProduto;
 

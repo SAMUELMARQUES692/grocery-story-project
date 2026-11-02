@@ -1,7 +1,7 @@
 package dev.samuel.projectgrocery.messaging.consumer;
 
 import dev.samuel.projectgrocery.configuration.RabbitMQConfig;
-import dev.samuel.projectgrocery.request.EstoqueBaixoEvent;
+import dev.samuel.projectgrocery.messaging.events.EstoqueBaixoEvent;
 import dev.samuel.projectgrocery.service.AlertaEstoqueService;
 import dev.samuel.projectgrocery.service.EmailService;
 import lombok.RequiredArgsConstructor;

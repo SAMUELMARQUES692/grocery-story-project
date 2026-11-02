@@ -9,7 +9,7 @@ import dev.samuel.projectgrocery.enums.StatusAlerta;
 import dev.samuel.projectgrocery.exception.AlertaEstoqueNotFoundException;
 import dev.samuel.projectgrocery.mapper.AlertaEstoqueMapper;
 import dev.samuel.projectgrocery.repository.AlertaEstoqueRepository;
-import dev.samuel.projectgrocery.request.EstoqueBaixoEvent;
+import dev.samuel.projectgrocery.messaging.events.EstoqueBaixoEvent;
 import dev.samuel.projectgrocery.response.AlertaEstoqueResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,7 +1,7 @@
 package dev.samuel.projectgrocery.messaging.producer;
 
 import dev.samuel.projectgrocery.configuration.RabbitMQConfig;
-import dev.samuel.projectgrocery.request.EstoqueBaixoEvent;
+import dev.samuel.projectgrocery.messaging.events.EstoqueBaixoEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.AmqpException;
