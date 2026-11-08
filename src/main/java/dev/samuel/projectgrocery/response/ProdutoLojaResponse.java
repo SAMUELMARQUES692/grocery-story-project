@@ -3,6 +3,7 @@ package dev.samuel.projectgrocery.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public record ProdutoLojaResponse(
         Long id,
@@ -13,8 +14,8 @@ public record ProdutoLojaResponse(
         boolean destaque,
 
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-        String createdAt,
+        LocalDateTime createdAt,
 
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-        String updatedAt
+        LocalDateTime updatedAt
 ) {}

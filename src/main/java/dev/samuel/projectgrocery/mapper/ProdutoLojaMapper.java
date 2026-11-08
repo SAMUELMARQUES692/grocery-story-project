@@ -13,7 +13,6 @@ public interface ProdutoLojaMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "produto", ignore = true)
     @Mapping(target = "visivel", ignore = true)
-    @Mapping(target = "destaque", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     ProdutoLoja toProdutoLoja(ProdutoLojaRequest request);
