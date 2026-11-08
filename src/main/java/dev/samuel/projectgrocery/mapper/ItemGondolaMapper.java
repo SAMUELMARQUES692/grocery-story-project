@@ -11,6 +11,7 @@ import org.mapstruct.MappingTarget;
 public interface ItemGondolaMapper {
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "version", ignore = true)
     @Mapping(target = "gondola", ignore = true)
     @Mapping(target = "produto", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
@@ -22,6 +23,7 @@ public interface ItemGondolaMapper {
     ItemGondolaResponse toItemGondolaResponse(ItemGondola itemGondola);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "version", ignore = true)
     @Mapping(target = "gondola", ignore = true)
     @Mapping(target = "produto", ignore = true)
     @Mapping(target = "quantidadeAtual", ignore = true)

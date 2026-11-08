@@ -29,6 +29,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/loja/produtos/**").permitAll()
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/loja/**").hasAuthority("SCOPE_CLIENTE")
                         .requestMatchers(HttpMethod.GET, "/api/admin/**").hasAnyAuthority("SCOPE_ADMIN", "SCOPE_USER")
                         .requestMatchers(HttpMethod.POST, "/api/admin/**").hasAuthority("SCOPE_ADMIN")

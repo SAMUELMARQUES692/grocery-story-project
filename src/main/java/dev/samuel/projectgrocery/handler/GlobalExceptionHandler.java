@@ -7,6 +7,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -52,6 +53,14 @@ public class GlobalExceptionHandler {
         log.warn("Violação de integridade: {}", ex.getMostSpecificCause().getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(
                 "VIOLACAO_DE_INTEGRIDADE", "Operação viola uma restrição do banco de dados"));
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ErrorResponse> estoqueAlterado(ObjectOptimisticLockingFailureException ex) {
+        log.info("Conflito de concorrência: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(
+                "ESTOQUE_ALTERADO",
+                "O estoque deste produto foi alterado por outra operação. Tente novamente."));
     }
 
     @ExceptionHandler(Exception.class)

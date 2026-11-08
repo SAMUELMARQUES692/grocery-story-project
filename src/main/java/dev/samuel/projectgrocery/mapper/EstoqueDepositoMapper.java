@@ -11,6 +11,7 @@ import org.mapstruct.MappingTarget;
 public interface EstoqueDepositoMapper {
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "version", ignore = true)
     @Mapping(target = "produto", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
@@ -20,6 +21,7 @@ public interface EstoqueDepositoMapper {
     EstoqueDepositoResponse toEstoqueDepositoResponse(EstoqueDeposito estoqueDeposito);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "version", ignore = true)
     @Mapping(target = "produto", ignore = true)
     @Mapping(target = "quantidade", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

@@ -36,6 +36,9 @@ public class ItemGondola {
     @Column(nullable = false)
     private Integer prateleira;
 
+    @Version
+    private Long version;
+
     @Column(nullable = false, name = "quantidade_atual")
     private Integer quantidadeAtual;
 

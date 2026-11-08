@@ -29,6 +29,9 @@ public class EstoqueDeposito {
     @Column(nullable = false)
     private Integer quantidade;
 
+    @Version
+    private Long version;
+
     @Column(name = "estoque_minimo", nullable = false)
     private Integer estoqueMinimo;
 
