@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
-@RequestMapping("api/loja/produto-imagem")
+@RequestMapping("/api/admin/produtos/{produtoId}/loja/imagens")
 @RestController
 public class ProdutoImagemController {
 
