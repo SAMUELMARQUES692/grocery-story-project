@@ -35,7 +35,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/admin/**").hasAuthority("SCOPE_ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/admin/**").hasAuthority("SCOPE_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/admin/**").hasAuthority("SCOPE_ADMIN")
-                        .anyRequest().authenticated()
+                        .anyRequest().denyAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(Customizer.withDefaults()))
