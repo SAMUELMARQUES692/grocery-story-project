@@ -23,12 +23,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProdutoService {
 
+    private static final String PREFIXO_USO_INTERNO = "200000"; // GS1: 20-29 = uso interno da loja
+
     private final ProdutoRepository produtoRepository;
     private final CategoriaRepository categoriaRepository;
     private final FornecedorRepository fornecedorRepository;
     private final ProdutoMapper produtoMapper;
-
-    private static final String PREFIXO_USO_INTERNO = "200000"; // GS1: 20-29 = uso interno da loja
 
    @Transactional
     public ProdutoResponse criarProduto(ProdutoRequest request) {

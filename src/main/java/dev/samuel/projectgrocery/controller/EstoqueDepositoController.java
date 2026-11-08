@@ -13,7 +13,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/estoque-deposito")
+@RequestMapping("/api/admin/estoque-deposito")
 public class EstoqueDepositoController {
 
     private final EstoqueDepositoService estoqueDepositoService;

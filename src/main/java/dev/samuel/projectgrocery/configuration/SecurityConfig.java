@@ -28,11 +28,13 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/**").hasAnyAuthority("SCOPE_ADMIN", "SCOPE_USER")
-                        .requestMatchers(HttpMethod.POST, "/**").hasAuthority("SCOPE_ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/**").hasAuthority("SCOPE_ADMIN")
-                        .requestMatchers(HttpMethod.PATCH, "/**").hasAuthority("SCOPE_ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/**").hasAuthority("SCOPE_ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/loja/produtos/**").permitAll()
+                        .requestMatchers("/api/loja/**").hasAuthority("SCOPE_CLIENTE")
+                        .requestMatchers(HttpMethod.GET, "/api/admin/**").hasAnyAuthority("SCOPE_ADMIN", "SCOPE_USER")
+                        .requestMatchers(HttpMethod.POST, "/api/admin/**").hasAuthority("SCOPE_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/admin/**").hasAuthority("SCOPE_ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/admin/**").hasAuthority("SCOPE_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/admin/**").hasAuthority("SCOPE_ADMIN")
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

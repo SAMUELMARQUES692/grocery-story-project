@@ -13,7 +13,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/gondola")
+@RequestMapping("/api/admin/gondola")
 public class GondolaController {
 
     private final GondolaService gondolaService;

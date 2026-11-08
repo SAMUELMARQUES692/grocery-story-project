@@ -11,7 +11,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/alerta-estoque")
+@RequestMapping("/api/admin/alerta-estoque")
 public class AlertaEstoqueController {
 
     private final AlertaEstoqueService alertaEstoqueService;

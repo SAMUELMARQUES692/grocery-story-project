@@ -13,7 +13,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/fornecedores")
+@RequestMapping("/api/admin/fornecedores")
 public class FornecedorController {
 
     private final FornecedorService fornecedorService;
