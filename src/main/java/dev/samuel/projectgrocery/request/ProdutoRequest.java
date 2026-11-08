@@ -7,10 +7,6 @@ import java.math.BigDecimal;
 
 public record ProdutoRequest(
 
-    @NotBlank(message = "Campo de codigo de barras é obrigatório")
-    @Pattern(regexp = "\\d{8}|\\d{12,14}", message = "Código de barras deve ter 8, 12, 13 ou 14 dígitos")
-    String codigoBarras,
-
     @NotBlank(message = "Campo de nome é obrigatório")
     @Size(max = 100, message = "Nome deve ter no máximo 100 caracteres")
     String nome,
