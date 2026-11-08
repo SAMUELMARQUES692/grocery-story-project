@@ -13,5 +13,4 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
     @Query(value = "SELECT nextval('codigo_produto_seq')", nativeQuery = true)
     Long proximoCodigo();
 
-    Optional<Produto> findByCodigoProduto(String codigoProduto);
 }

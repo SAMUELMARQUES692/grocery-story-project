@@ -28,6 +28,8 @@ public class ProdutoService {
     private final FornecedorRepository fornecedorRepository;
     private final ProdutoMapper produtoMapper;
 
+    private static final String PREFIXO_USO_INTERNO = "200000"; // GS1: 20-29 = uso interno da loja
+
    @Transactional
     public ProdutoResponse criarProduto(ProdutoRequest request) {
         Categoria categoria = categoriaRepository.findById(request.categoriaId())
@@ -55,6 +57,7 @@ public class ProdutoService {
                .toList();
     }
 
+    @Transactional
     public ProdutoResponse atualizarProduto(Long id, ProdutoRequest request) {
        Produto produto = produtoRepository.findById(id)
                .orElseThrow(() -> new ProdutoNotFoundException(id));
@@ -65,6 +68,7 @@ public class ProdutoService {
        return produtoMapper.toProdutoResponse(salvar);
     }
 
+    @Transactional
     public void deletarProduto(Long id) {
         Produto produto = produtoRepository.findById(id)
                 .orElseThrow(() -> new ProdutoNotFoundException(id));
@@ -80,8 +84,6 @@ public class ProdutoService {
         }
         return String.format("%06d", codigo);
     }
-
-    private static final String PREFIXO_USO_INTERNO = "200000"; // GS1: 20-29 = uso interno da loja
 
     private String gerarCodigoDeBarras(String codigoProduto) {
         String base = PREFIXO_USO_INTERNO + codigoProduto; // 6 + 6 = 12 digitos
