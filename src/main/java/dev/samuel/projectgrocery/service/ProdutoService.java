@@ -44,6 +44,7 @@ public class ProdutoService {
        produto.setFornecedor(fornecedor);
        produto.setCodigoProduto(codigoProduto);
        produto.setCodigoBarras(codigoDeBarras);
+
        Produto salvar = produtoRepository.save(produto);
        return produtoMapper.toProdutoResponse(salvar);
     }
@@ -80,39 +81,19 @@ public class ProdutoService {
         return String.format("%06d", codigo);
     }
 
-    private Integer calculoCodigoBarras(String codigo) {
-        Produto produto = produtoRepository.findByCodigoProduto(codigo)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado com codigo: " + codigo));
+    private static final String PREFIXO_USO_INTERNO = "200000"; // GS1: 20-29 = uso interno da loja
 
-        String codigoBrasil = "789";
-        String codigoEmpresa = "426";
-        String codigoProduto = produto.getCodigoProduto();
-
-        String codigoConcatenado = codigoBrasil + codigoEmpresa + codigoProduto;
-
-        if (codigoConcatenado.length() != 12 || !codigoConcatenado.matches("\\d+")) {
-            throw new IllegalArgumentException("Código deve ter 12 dígitos numéricos: " + codigoConcatenado);
-        }
+    private String gerarCodigoDeBarras(String codigoProduto) {
+        String base = PREFIXO_USO_INTERNO + codigoProduto; // 6 + 6 = 12 digitos
 
         int soma = 0;
-        for (int i = 0; i < codigoConcatenado.length(); i++) {
-            int digito = codigoConcatenado.charAt(i) - '0';   // converte o caractere em número
-            int peso = (i % 2 == 0) ? 1 : 3;                  // posições pares: peso 1, ímpares: peso 3
+        for (int i = 0; i < base.length(); i++) {
+            int digito = base.charAt(i) - '0';
+            int peso = (i % 2 == 0) ? 1 : 3;
             soma += digito * peso;
         }
+        int digitoVerificador = (10 - (soma % 10)) % 10;
 
-        return (10 - (soma % 10)) % 10;   // dígito verificador
-    }
-
-    private String gerarCodigoDeBarras(String codigo) {
-       Produto produto = produtoRepository.findByCodigoProduto(codigo)
-               .orElseThrow(() -> new RuntimeException("Produto não encontrado com codigo: " + codigo));
-
-       String codigoBrasil = "789";
-       String codigoEmpresa = "426";
-       String codigoProduto = produto.getCodigoProduto();
-       String digitoVarificacao = String.valueOf(calculoCodigoBarras(codigo));
-
-       return codigoBrasil + codigoEmpresa + codigoProduto + digitoVarificacao;
+        return base + digitoVerificador; // EAN-13
     }
 }
